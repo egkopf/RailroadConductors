@@ -24,17 +24,6 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-plt.rcParams['axes.labelsize'] = 14
-plt.rcParams['xtick.labelsize'] = 12
-plt.rcParams['ytick.labelsize'] = 12
-
-# Where to save the figures that our code generates
-def save_fig(fig_id, tight_layout=True):
-   path = os.path.join("ML_" + fig_id + ".png") #PROJECT_ROOT_DIR, "images", CHAPTER_ID, fig_id + ".png")
-   print("Saving figure", fig_id)
-   if tight_layout:
-      plt.tight_layout()
-   plt.savefig(path, format='png', dpi=300)
 
 ####################
 # STEP 1: OBTAIN THE DATA
@@ -44,64 +33,35 @@ def save_fig(fig_id, tight_layout=True):
 # The sklearn package has a function that can download the data for us:
 #from sklearn.datasets import fetch_mldata
 
-# TO DO: use the fetch_mldata function to download the dataset
-#      and load it into our workspace with the variable name
-#      'mnist'.  The fetch_mldata function takes one argument,
-#      the name of the dataset we want to download. The name
-#      of the dataset to download is 'MNIST original'.
-#mnist = fetch_mldata("MNIST original")
-
 RailroadData = pd.read_excel("/Users/ethankopf/Desktop/Dispatchers_Background_Data 3.xlsx")
-print(RailroadData)
-print(RailroadData.keys())
-
-# Now, If we want to preview the dataset on the screen, we can print
-# it:
 
 
-# TO DO: We can see that our variable is a dictionary. It contains multiple
-# fields that are named and have different types of data in them. If we want
-# a clearer look at just the field names in the dictionary, we can use the
-# "keys()" function by entering our variable name followed immediately by
-# ".keys()"  (but without the quotes around it), and use that expression as
-# an argument in the print function:
+HealthStatus = RailroadData['Health_status'].values.astype(np.float)
+ID = RailroadData['ID'].values
+Sex = RailroadData['Sex'].values.astype(np.float)
+CaffBeverages = RailroadData['Caff_Beverages'].values.astype(np.float)
+SleepApnea = RailroadData['Sleep_Apnea'].values.astype(np.float)
+AgeGroup = RailroadData['Age_Group'].values.astype(np.float)
+TotalYearsDispatcher = RailroadData['Total_years_dispatcher'].values.astype(np.float)
+MaritalStatus = RailroadData['Marital_Status'].values.astype(np.float)
+Childrendependents = RailroadData['Childrendependents'].values.astype(np.float)
+DiagnosedSleepDisorder = RailroadData['Diagnosed_Sleep_disorder'].values.astype(np.float)
+AvgWorkHrsWeek = RailroadData['Avg_Work_Hrs_Week'].values.astype(np.float)
+MentallyDrained = RailroadData['Mentally_Drained'].values.astype(np.float)
+JobPressure = RailroadData['Job_pressure'].values.astype(np.float)
+TotalLifeEvents = RailroadData['Total_life_events'].values.astype(np.float)
+NumCaffBev = RailroadData['Num_Caff_Bev'].values.astype(np.float)
 
+    
+TrainPatients = []  
+for i in range(0, 354):
+    TrainPatients.append([AgeGroup[i], Sex[i], AgeGroup[i], TotalYearsDispatcher[i], MaritalStatus[i], Childrendependents[i], AvgWorkHrsWeek[i], MentallyDrained[i], JobPressure[i], TotalLifeEvents[i], NumCaffBev[i]])
 
+TestPatients = []
+for i in range(354, 443):
+    TestPatients.append([AgeGroup[i], Sex[i], AgeGroup[i], TotalYearsDispatcher[i], MaritalStatus[i], Childrendependents[i], AvgWorkHrsWeek[i], MentallyDrained[i], JobPressure[i], TotalLifeEvents[i], NumCaffBev[i]])
 
-# TO DO: let's organize our dataset into two variables, one a matrix that contains
-#      all the descriptions of the handwritten numbers (in the "data" key of the
-#      dictionary) and one a vector that contains the labels for each of those
-#      numbers, the label being the actual number that was written (in the "target"
-#      key of the dictionary).
-#      Let's name the matrix of handwriting data "X" and the vector of labels "y":
-#X = mnist['data']
-#y = mnist['target']
-
-HealthStatus = RailroadData['Health_status']
-ID = RailroadData['ID']
-Sex = RailroadData['Sex']
-CaffBeverages = RailroadData['Caff_Beverages']
-SleepApnea = RailroadData['Sleep_Apnea']
-AgeGroup = RailroadData['Age_Group']
-TotalYearsDispatcher = RailroadData['Total_years_dispatcher']
-MaritalStatus = RailroadData['Marital_Status']
-Childrendependents = RailroadData['Childrendependents']
-DiagnosedSleepDisorder = RailroadData['Diagnosed_Sleep_disorder']
-AvgWorkHrsWeek = RailroadData['Avg_Work_Hrs_Week']
-MentallyDrained = RailroadData['Mentally_Drained']
-JobPressure = RailroadData['Job_pressure']
-TotalLifeEvents = RailroadData['Total_life_events']
-NumCaffBev = RailroadData['Num_Caff_Bev']
-
-
-# TO DO: Now, we can check the size of our dataset by using the shape function (this is
-#      one of the few times where we need to call it without adding parenthesis at the
-#      the end). We can call this function on our dataset by adding ".shape" to the
-#      variable name (note: if nothing appears in the output terminal, wrap this
-#      line with a print command):
-print(HealthStatus.size)
-
-
+print(TrainPatients)
 # Now we see that our matrix has 70,000 rows, meaning it describes 70,000
 # handwritten numbers. The matrix has 728 columns, so each of the 70,000
 # handwritten numbers in our database is described by 728 data points. These points
@@ -122,9 +82,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-# TO DO: Let's look at one of the numbers described in our matrix. First, define a new
-#      variable called 'some_digit' that is equal to one of the rows of data in matrix X:
-some_digit = 55
+# TO DO: Let's look at one of the numbers described in our matrix. First, define a new variable called 'some_digit' that is equal to one of the rows of data in matrix X:
 
 # TO DO: Now, we need to reshape that row into a square, the 28x28 square that can
 #      represent the picture of that handwritten number. We can do this in two
@@ -138,69 +96,10 @@ some_digit = 55
 #      the row and column dimensions to reshape our variable into, and save
 #      this reshaped subset as a new variable, some_digit_image:
 # some_digit_image = np.reshape(X[some_digit,:],[28,28])
-# TO DO: Next, we need to use pyplot's "imshow" function to show our image. The arguments
-#      it takes are the 28x28 matrix we just made to describe the image, a colormap that
-#      tells pyplot which colors are represented by which values found in the matrix, and
-#      a method for handling values in the matrix that don't exactly match the values
-#      defined in the color map (ex: if the color map only says 0.1 = almost black and
-#      0.5 = medium gray, pyplot needs to know what to do for the value 0.3). Uncomment
-#      the following lines to show a picture of the handwritten number:
 
-print(HealthStatus[some_digit])
-#plt.imshow(some_digit_data, cmap = matplotlib.cm.binary,interpolation="nearest")
-#plt.axis("off")
-# plt.show()
-
-# Edit the file name if you wish
-#plt.savefig("testimg.png")
-
-# TO DO: What if we want to look at other numbers in our dataset? It's more efficient
-#      to write a function that repeats the steps we just did:
-#      Given a row of the matrix, the function should reshape it into a 28x28 square,
-#      plot it in an image using the imshow function, and then turn the axis off so
-#      that the resulting figure looks like an image and not a graph. Try defining a
-#      function called 'plot_digit' that accomplishes this task, where 'data' is the
-#      name given the incoming argument (the row of the matrix with 728 data points).
-#      Remember to indent the substatements of the function by four spaces:
-#def plot_digit(data):
-#   newImage = np.reshape(data,[28,28])
-#   plt.imshow(newImage, cmap = matplotlib.cm.binary,interpolation="nearest")
-#   plt.axis("off")
-#   plt.savefig("dht.png")
-
-# TO DO: Now, let's test out our new function on the handwritten number in row
-#      3600 of our X matrix. We should be able to call it as follows:
-
-# plot_digit(X[43679])
-
-# What number do you see when you call that function? Is the number hard to read?
-# What number is the computer likely to think it is? If you are unsure what number
-# it is, can you think of an easy way to find out?
-
-# TO DO: Sometimes we may want to view a whole bunch of numbers at once. For that,
-#      we can define a different function that shows many numbers together. The
-#      function is already written for you here, just uncomment each line. As you
-#      uncomment each line, take a look at it to see if you can figure out what
-#      that line of code is doing:
 def print_row(row):
     row -= 2
     print("ID: ", ID[row] , '\n\tAge Group: ', AgeGroup[row] , "\n\tSex: ", Sex[row], "\n\tTotal Years Dispatcher: ", TotalYearsDispatcher[row], "\n\tMarital Status: ", MaritalStatus[row], "\n\tChildrendependents: ", Childrendependents[row], "\n\tCaff Beverage: ", CaffBeverages[row], "\n\tHealth Status: ", HealthStatus[row], "\n\tDiagnosed Sleep Disorder: ", DiagnosedSleepDisorder[row], "\n\tSleep Apnea: ", SleepApnea[row], '\n\tAvg Work Hrs Week: ', AvgWorkHrsWeek[row], "\n\tMentally Drained: ", MentallyDrained[row], "\n\tJob Pressure: ", JobPressure[row], "\n\tTotal Life Events: ", TotalLifeEvents[row], "\n\tNum Caff Bev: ", NumCaffBev[row])  
-#for i in range(2, 445):
-#    print_row(i)
-    
-        
-        
-print_row(50)
-
-
-# TO DO: Now, we can make use of this new function to show many handwritten
-#      numbers at a time. Uncomment the following lines to show many numbers:
-#plt.figure(figsize=(9,9))
-#example_images = np.r_[X[:12000:600], X[13000:30600:600], X[30600:60000:590]]
-#plot_digits(example_images, images_per_row=10)
-#plt.savefig("exampleimages.png")
-
-
 
 ####################
 # STEP 2: SEPARATE TRAINING AND TEST DATA
@@ -212,66 +111,20 @@ print_row(50)
 #      use 60,000 numbers for training and 10,000 for test.
 #      Use your knowledge of slicing arrays to select the first
 #      60,000 numbers for training and the last 10,000 for testing:
-
-#Train_Indeces = range(2,354)
-#Test_Indeces = range(354, 445)
+    
 
 Train_Sleep_Apnea = SleepApnea[0:354]
-Train_Caff_Beverages = NumCaffBev[0:354]
-Test_Sleep_Apnea = SleepApnea[354:443]
-Test_Caff_Beverages = NumCaffBev[354:443]
+Test_Sleep_Apnea = SleepApnea[354:445]
 
 #print(Train_Sleep_Apnea)
 #print(Train_Caff_Beverages)
-#print(Test_Sleep_Apnea)
-#print(Test_Caff_Beverages)
 
 
-# Next, let's shuffle the data in case there is an order to the
-# numbers in our matrix. Machine learning algorithms may be thrown
-# off if a lot of the same number are presented in a row or if the
-# order of numbers presented follows a specific pattern. Therefore,
-# we will randomly rearrange the numbers in our test data set to
-# disrupt any patterns in the presentation of the numbers.
+# print(Train_Sleep_Apnea)
+# print(Train_Caff_Beverages)
+# print(Test_Sleep_Apnea)
+# print(Test_Caff_Beverages)
 
-# TO DO: Uncomment the following code to load in a new module and
-#      create a vector that will list the row indices of our
-#      test matrix in random order. Then we can use that vector
-#      to rearrange the test matrix:
-#import numpy as np
-
-#shuffle_index = np.random.permutation(60000)
-#X_train, y_train = X_train[shuffle_index], y_train[shuffle_index]
-
-
-####################
-# STEP 3: TRAIN THE NETWORK
-####################
-
-# We'll first start with a simpler task of having the network
-# only differentiate between 5s and everything else. THis task,
-# in which every number will be separated into one of two
-# categories, is called a binary classification task.
-
-# We need to copy the rows from our data matrix that correspond
-# to the number 5. However, the only way to know which rows
-# represent 5s is to consult our label vector. We can create a
-# vector of row indices that correspond to 5s from our label
-# vector using the commands below. Notice that we have to do
-# this both for the training vector and for the test vector.
-
-# TO DO: Uncomment the code below to create vectors that
-#      list whether each entry in the training and test sets
-#      is a 5 or is not a 5:
-#y_train_5 = (y_train == 5)
-#y_test_5 = (y_test == 5)
-
-
-# Now, we are ready to train our network using the training
-# data. The algorithm we want to use, SGDClassifier, must
-# be imported from the sklearn module.
-
-# TO DO: Uncomment the code below to import the algorithm:
 from sklearn.linear_model import SGDClassifier
 
 # TO DO: Now, we need to call the SGDClassifier. This function
@@ -284,7 +137,7 @@ from sklearn.linear_model import SGDClassifier
 #      output of the function to 'sgd_clf'. This represents
 #      our learning algorithm object.
 #
-sgd_clf = SGDClassifier(max_iter=5, random_state=42)
+sgd_clf = SGDClassifier(max_iter=5, random_state=42, loss = "modified_huber")
 
 # TO DO: Next, we need to provide our learning algorithm with the
 #      training data and its corresponding labels. Because we
@@ -295,20 +148,15 @@ sgd_clf = SGDClassifier(max_iter=5, random_state=42)
 #      fit() method of the sgd_clf object with two arguments, the
 #      training data set and the new label vector (with 0 for non-5
 #      and 1 for 5).
-Train_Caff_Beverages=Train_Caff_Beverages.to_numpy().reshape((-1,1))
-Train_Sleep_Apnea=Train_Sleep_Apnea.to_numpy().reshape((-1,1))
-print(Train_Caff_Beverages)
-print(Train_Sleep_Apnea)
-print(Train_Caff_Beverages[9])
-sgd_clf.fit(Train_Sleep_Apnea, Train_Caff_Beverages)
-
-
+sgd_clf.fit(TrainPatients, Train_Sleep_Apnea)
 
 # TO DO: Now let's see what our trained algorithm thinks that strange
 #      looking number is. Uncomment and run the following code to
 #      find out:
 
-print(sgd_clf.predict([10]))
+print(sgd_clf.predict(TestPatients))
+print(Test_Sleep_Apnea)
+
 
 ####################
 # STEP 5: EVALUATE THE NETWORK PERFORMANCE
@@ -324,8 +172,9 @@ print(sgd_clf.predict([10]))
 #      dataset (X_train), our label vector that labels whether each training row
 #      is a 5 or not a 5 (called y_train_5, don't use the other vector y_train
 #      for this exercise), and two named arguments: cv=3, scoring="accuracy"
+
 from sklearn.model_selection import cross_val_score
-performance = cross_val_score(sgd_clf, Train_Caff_Beverages, Train_Sleep_Apnea, cv=3, scoring="accuracy")
+performance = cross_val_score(sgd_clf, TestPatients, Test_Sleep_Apnea, cv=3, scoring="accuracy")
 print("cross_val_score = ", performance)
 
 
@@ -351,15 +200,15 @@ print("cross_val_score = ", performance)
 #     with two arguments, the target classifications (y_train_5) and the predicted
 #     classifications (y_train_pred):
 from sklearn.metrics import confusion_matrix, precision_score, recall_score
-newperformance = confusion_matrix(Train_Sleep_Apnea, sgd_clf.predict(Train_Caff_Beverages))
+newperformance = confusion_matrix(Test_Sleep_Apnea, sgd_clf.predict(TestPatients))
 print(newperformance)
 #
 # We can also calculate values for precision and recall directly, by importing and
 # using the precision_score and recall_score functions from sklearn.metrics (and
 # passing in the same two arguments as when we called the confusion_matrix function)
-#precision = precision_score(y_train_5, sgd_clf.predict(X_train))
-#recall = recall_score(y_train_5, sgd_clf.predict(X_train))
-#print("precision = ", precision, ", recall = ", recall)
+precision = precision_score(Test_Sleep_Apnea, sgd_clf.predict(TestPatients))
+recall = recall_score(Test_Sleep_Apnea, sgd_clf.predict(TestPatients))
+print("precision = ", precision, ", recall = ", recall)
 
 # The model performance is a balance between precision and recall. If we alter the
 # sensitivity of the model, we can increase precision but at the expense of recall,
@@ -368,9 +217,8 @@ print(newperformance)
 # if both precision and recall are sufficiently strong. To calculate the F1 score,
 # import and use the f1_score function from sklearn.metrics:
 from sklearn.metrics import f1_score
-#f1performance = f1_score(y_train_5, sgd_clf.predict(X_train))
-#print("F1 score = ", f1performance)
-
+f1performance = f1_score(Test_Sleep_Apnea, sgd_clf.predict(TestPatients))
+print("F1 score = ", f1performance)
 
 ####################
 # STEP 6: MULTICLASS CLASSIFICATION TASK
@@ -423,7 +271,7 @@ from sklearn.metrics import f1_score
 #     random forest classifier (forest_clf), passing in the same arguments as when
 #     we used the previous algorithm:
 
-from sklearn.ensemble import RandomForestClassifier
+#from sklearn.ensemble import RandomForestClassifier
 #forest_clf = RandomForestClassifier(random_state=42)
 #forest_clf.fit(X_train, y_train)
 #forest_prediction = forest_clf.predict(X_train)
