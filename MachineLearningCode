@@ -33,73 +33,54 @@ import matplotlib.pyplot as plt
 # The sklearn package has a function that can download the data for us:
 #from sklearn.datasets import fetch_mldata
 
-RailroadData = pd.read_excel("/Users/ethankopf/Desktop/Dispatchers_Background_Data 3.xlsx")
+PatientData = pd.read_excel("/Users/ethankopf/Desktop/NYCpatientsML.xlsx")
 
+Sex = PatientData['Sex'].values
+Transgender = (PatientData['Transgender'].values == "YES, TRANSGENDER")
+SexualOrientation = PatientData['Sexual Orientation'].values
+HispanicEthnicity = (PatientData['Hispanic Ethnicity'].values == "YES")
+Race = PatientData['Race'].values
+newRaces = []
+for i in Race:
+    if i == "WHITE ONLY":
+        newRaces.append(0)
+    if i == "5":
+        newRaces.append(1)
+    if i == "BLACK ONLY":
+        newRaces.append(2)
+    if i == "3 RACE":
+        newRaces.append(3)
+    if i == "MULTI-RACIAL":
+        newRaces.append(4)
+Race = newRaces
+VeteranStatus = (PatientData['Veteran Status'].values == "YES")
+MentalIllness = (PatientData['Mental Illness'].values == "YES")
+IntellectualDisability = (PatientData['Intellectual Disability'].values == "YES") 
+AutismSpectrum = (PatientData['Autism Spectrum'].values == "YES")
+OtherDevelopmentalDisability = (PatientData['Other Developmental Disability'].values == "YES")
+AlcoholRelatedDisorder = (PatientData['Alcohol Related Disorder'].values == "YES")
+Diabetes	 = (PatientData['Diabetes'].values=='YES')
+Obesity = (PatientData['Obesity'].values=='YES')
+HeartAttack	= (PatientData['Heart Attack'].values=='YES')
+Stroke = (PatientData['Stroke'].values=='YES')
+FiveCardiac = (PatientData['5 Cardiac'].values=='YES')
+PulmonaryAsthma = (PatientData['Pulmonary Asthma'].values=='YES')
+KidneyDisease = (PatientData['Kidney Disease'].values=='YES')
+LiverDisease = (PatientData['Liver Disease'].values=='YES')
+EndocrineCondition = (PatientData['Endocrine Condition'].values=='YES')
 
-HealthStatus = RailroadData['Health_status'].values.astype(np.float)
-ID = RailroadData['ID'].values
-Sex = RailroadData['Sex'].values.astype(np.float)
-CaffBeverages = RailroadData['Caff_Beverages'].values.astype(np.float)
-SleepApnea = RailroadData['Sleep_Apnea'].values.astype(np.float)
-AgeGroup = RailroadData['Age_Group'].values.astype(np.float)
-TotalYearsDispatcher = RailroadData['Total_years_dispatcher'].values.astype(np.float)
-MaritalStatus = RailroadData['Marital_Status'].values.astype(np.float)
-Childrendependents = RailroadData['Childrendependents'].values.astype(np.float)
-DiagnosedSleepDisorder = RailroadData['Diagnosed_Sleep_disorder'].values.astype(np.float)
-AvgWorkHrsWeek = RailroadData['Avg_Work_Hrs_Week'].values.astype(np.float)
-MentallyDrained = RailroadData['Mentally_Drained'].values.astype(np.float)
-JobPressure = RailroadData['Job_pressure'].values.astype(np.float)
-TotalLifeEvents = RailroadData['Total_life_events'].values.astype(np.float)
-NumCaffBev = RailroadData['Num_Caff_Bev'].values.astype(np.float)
+AorD = PatientData['Alzheimer or Dementia'].values
+AorD = (AorD == "YES")
 
     
 TrainPatients = []  
-for i in range(0, 354):
-    TrainPatients.append([AgeGroup[i], Sex[i], AgeGroup[i], TotalYearsDispatcher[i], MaritalStatus[i], Childrendependents[i], AvgWorkHrsWeek[i], MentallyDrained[i], JobPressure[i], TotalLifeEvents[i], NumCaffBev[i]])
+for i in range(0, 37722):
+    TrainPatients.append([Sex[i], Transgender[i], SexualOrientation[i], HispanicEthnicity[i], Race[i], VeteranStatus[i], MentalIllness[i], IntellectualDisability[i], AutismSpectrum[i], OtherDevelopmentalDisability[i], AlcoholRelatedDisorder[i], Diabetes[i], Obesity[i], HeartAttack[i], Stroke[i], FiveCardiac[i], PulmonaryAsthma[i], KidneyDisease[i], LiverDisease[i], EndocrineCondition[i]])
 
 TestPatients = []
-for i in range(354, 443):
-    TestPatients.append([AgeGroup[i], Sex[i], AgeGroup[i], TotalYearsDispatcher[i], MaritalStatus[i], Childrendependents[i], AvgWorkHrsWeek[i], MentallyDrained[i], JobPressure[i], TotalLifeEvents[i], NumCaffBev[i]])
+for i in range(37722, 47152):
+    TestPatients.append([Sex[i], Transgender[i], SexualOrientation[i], HispanicEthnicity[i], Race[i], VeteranStatus[i], MentalIllness[i], IntellectualDisability[i], AutismSpectrum[i], OtherDevelopmentalDisability[i], AlcoholRelatedDisorder[i], Diabetes[i], Obesity[i], HeartAttack[i], Stroke[i], FiveCardiac[i], PulmonaryAsthma[i], KidneyDisease[i], LiverDisease[i], EndocrineCondition[i]])
 
-print(TrainPatients)
-# Now we see that our matrix has 70,000 rows, meaning it describes 70,000
-# handwritten numbers. The matrix has 728 columns, so each of the 70,000
-# handwritten numbers in our database is described by 728 data points. These points
-# define a 28 pixel x 28 pixel square. There is one data point for each pixel in the
-# square, which gives the shade of gray in that square (anything from white to black
-# and all the shades of gray in-between). If we were to graph a figure using the data
-# for one of those handwritten numbers, we would get a 28x28 sized square that depicts
-# a single hand-written number.
-
-####################
-# STEP 2: EXPLORE THE DATA
-####################
-
-# TO DO: Import the plotting package matplotlib. Uncomment the following
-#      two lines to import matplotlib and to have a short way to refer
-#      to its subpackage pyplot:
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
-# TO DO: Let's look at one of the numbers described in our matrix. First, define a new variable called 'some_digit' that is equal to one of the rows of data in matrix X:
-
-# TO DO: Now, we need to reshape that row into a square, the 28x28 square that can
-#      represent the picture of that handwritten number. We can do this in two
-#      steps. First take a subset of our X variable, where we define the row
-#      and column indices we want in our subset. We want to use the value of
-#      some_digit as our row. And we want all columns (all indices in the row) to
-#      be included in our data subset, so keep in mind that the argument we provide
-#      for the column argument of X will not be a single number.
-#      After slicing the X matrix to get the data from a single row, we can
-#      call the reshape function of that subset, which takes two arguments,
-#      the row and column dimensions to reshape our variable into, and save
-#      this reshaped subset as a new variable, some_digit_image:
-# some_digit_image = np.reshape(X[some_digit,:],[28,28])
-
-def print_row(row):
-    row -= 2
-    print("ID: ", ID[row] , '\n\tAge Group: ', AgeGroup[row] , "\n\tSex: ", Sex[row], "\n\tTotal Years Dispatcher: ", TotalYearsDispatcher[row], "\n\tMarital Status: ", MaritalStatus[row], "\n\tChildrendependents: ", Childrendependents[row], "\n\tCaff Beverage: ", CaffBeverages[row], "\n\tHealth Status: ", HealthStatus[row], "\n\tDiagnosed Sleep Disorder: ", DiagnosedSleepDisorder[row], "\n\tSleep Apnea: ", SleepApnea[row], '\n\tAvg Work Hrs Week: ', AvgWorkHrsWeek[row], "\n\tMentally Drained: ", MentallyDrained[row], "\n\tJob Pressure: ", JobPressure[row], "\n\tTotal Life Events: ", TotalLifeEvents[row], "\n\tNum Caff Bev: ", NumCaffBev[row])  
 
 ####################
 # STEP 2: SEPARATE TRAINING AND TEST DATA
@@ -112,9 +93,12 @@ def print_row(row):
 #      Use your knowledge of slicing arrays to select the first
 #      60,000 numbers for training and the last 10,000 for testing:
     
+print(AorD.size)
+Train_Alzheimers = AorD[0:37722]
+Test_Alzheimers = AorD[37722:47152]
 
-Train_Sleep_Apnea = SleepApnea[0:354]
-Test_Sleep_Apnea = SleepApnea[354:445]
+Train_Alzheimers.reshape(-1, 1)
+Test_Alzheimers.reshape(-1, 1)
 
 #print(Train_Sleep_Apnea)
 #print(Train_Caff_Beverages)
@@ -139,23 +123,13 @@ from sklearn.linear_model import SGDClassifier
 #
 sgd_clf = SGDClassifier(max_iter=5, random_state=42, loss = "modified_huber")
 
-# TO DO: Next, we need to provide our learning algorithm with the
-#      training data and its corresponding labels. Because we
-#      created a new vector called y_train_5, our labels for this
-#      task are no longer the actual number represented by the
-#      training data, but are instead all set to 0 for numbers
-#      that are not 5 and to 1 for numbers that are 5.  Call the
-#      fit() method of the sgd_clf object with two arguments, the
-#      training data set and the new label vector (with 0 for non-5
-#      and 1 for 5).
-sgd_clf.fit(TrainPatients, Train_Sleep_Apnea)
+print(TrainPatients)
+print(Train_Alzheimers)
 
-# TO DO: Now let's see what our trained algorithm thinks that strange
-#      looking number is. Uncomment and run the following code to
-#      find out:
+sgd_clf.fit(TrainPatients, Train_Alzheimers)
 
 print(sgd_clf.predict(TestPatients))
-print(Test_Sleep_Apnea)
+
 
 
 ####################
@@ -174,7 +148,7 @@ print(Test_Sleep_Apnea)
 #      for this exercise), and two named arguments: cv=3, scoring="accuracy"
 
 from sklearn.model_selection import cross_val_score
-performance = cross_val_score(sgd_clf, TestPatients, Test_Sleep_Apnea, cv=3, scoring="accuracy")
+performance = cross_val_score(sgd_clf, TestPatients, Test_Alzheimers, cv=3, scoring="accuracy")
 print("cross_val_score = ", performance)
 
 
@@ -200,14 +174,14 @@ print("cross_val_score = ", performance)
 #     with two arguments, the target classifications (y_train_5) and the predicted
 #     classifications (y_train_pred):
 from sklearn.metrics import confusion_matrix, precision_score, recall_score
-newperformance = confusion_matrix(Test_Sleep_Apnea, sgd_clf.predict(TestPatients))
+newperformance = confusion_matrix(Test_Alzheimers, sgd_clf.predict(TestPatients))
 print(newperformance)
 #
 # We can also calculate values for precision and recall directly, by importing and
 # using the precision_score and recall_score functions from sklearn.metrics (and
 # passing in the same two arguments as when we called the confusion_matrix function)
-precision = precision_score(Test_Sleep_Apnea, sgd_clf.predict(TestPatients))
-recall = recall_score(Test_Sleep_Apnea, sgd_clf.predict(TestPatients))
+precision = precision_score(Test_Alzheimers, sgd_clf.predict(TestPatients))
+recall = recall_score(Test_Alzheimers, sgd_clf.predict(TestPatients))
 print("precision = ", precision, ", recall = ", recall)
 
 # The model performance is a balance between precision and recall. If we alter the
@@ -217,7 +191,7 @@ print("precision = ", precision, ", recall = ", recall)
 # if both precision and recall are sufficiently strong. To calculate the F1 score,
 # import and use the f1_score function from sklearn.metrics:
 from sklearn.metrics import f1_score
-f1performance = f1_score(Test_Sleep_Apnea, sgd_clf.predict(TestPatients))
+f1performance = f1_score(Test_Alzheimers, sgd_clf.predict(TestPatients))
 print("F1 score = ", f1performance)
 
 ####################
