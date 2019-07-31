@@ -1,3 +1,13 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Jul 23 13:50:26 2019
+
+@author: ethankopf
+"""
+
+
+
 from __future__ import division, print_function, unicode_literals
 
 import numpy as np
@@ -65,6 +75,8 @@ Train_Alzheimers.reshape(-1, 1)
 Test_Alzheimers.reshape(-1, 1)
 
 
+
+
 from sklearn.linear_model import SGDClassifier
 
 sgd_clf = SGDClassifier(max_iter=600, random_state=1, loss = "modified_huber")
@@ -75,6 +87,8 @@ print(Train_Alzheimers)
 sgd_clf.fit(TrainPatientsBeta, Train_Alzheimers)
 
 print(sgd_clf.predict(TestPatientsBeta))
+
+
 
 from sklearn.model_selection import cross_val_score
 performance = cross_val_score(sgd_clf, TestPatientsBeta, Test_Alzheimers, cv=3, scoring="accuracy")
@@ -90,3 +104,78 @@ precision = precision_score(Test_Alzheimers, sgd_clf.predict(TestPatientsBeta))
 recall = recall_score(Test_Alzheimers, sgd_clf.predict(TestPatientsBeta))
 print("precision = ", precision, ", recall = ", recall)
 
+
+
+from sklearn.metrics import f1_score
+f1performance = f1_score(Test_Alzheimers, sgd_clf.predict(TestPatientsBeta))
+print("F1 score = ", f1performance)
+
+# Let's compare the performance of two different approaches to multiclassification:
+# - using a set of binary classifiers in an OvA configuration
+# - using a multiclassifier
+#
+# TODO: Use the SDGclassifier again. This time, we will be working with y_train labels
+#     (not y_train_5 labels). Scroll or "find" many lines back in this script where
+#     you used the "fit" and "predict" functions of the sgd_clf class. Use them again
+#     here with the same data (X_train) and the appropriate set of labels (y_train).
+#sgd_clf.fit(X_train, y_train)
+#sgd_clf.predict(X_train)
+
+# TODO: Now see how this algorithm does on that same digit we used before, except now the
+#     algorithm is performing a multiclassification task. Uncomment the next two lines:
+#some_digit_scores = sgd_clf.decision_function([some_digit])
+#print("scores for some_digit=", some_digit_scores)
+#
+# Notice that scores are returned for each potential label of the digit, from 0 to 9.
+# Which score is the highest?
+#
+# TODO: To programmatically arrive at the highest-scoring category, uncomment these lines
+#     of code. Try to understand what each line does as you uncomment it:
+#n = np.argmax(some_digit_scores)
+#prediction = sgd_clf.classes_[n]
+
+# Now, let's try another approach, a multiclassifier algorithm called Random Forest.
+
+# TODO: call training function (fit) and a prediction function (prediction) for the
+#     random forest classifier (forest_clf), passing in the same arguments as when
+#     we used the previous algorithm:
+
+from sklearn.ensemble import RandomForestClassifier
+forest_clf = RandomForestClassifier(random_state=42)
+forest_clf.fit(TrainPatientsBeta, Train_Alzheimers)
+forest_prediction = forest_clf.predict(TrainPatientsBeta)
+
+# This function called directly gave us the predicted label for our "some_digit". But
+# what if we want to see how it rated all the possible options? If we want to see the
+# scores assigned to each potential label, we can run this line of code to get them:
+possible_scores = forest_clf.predict_proba(TestPatientsBeta)
+print(possible_scores)
+
+results = cross_val_score(forest_clf, TestPatientsBeta, Test_Alzheimers, cv=3, scoring="accuracy")
+print(results)
+
+newConfusion = confusion_matrix(Test_Alzheimers, forest_clf.predict(TestPatientsBeta))
+print(newConfusion)
+
+newf1performance = f1_score(Test_Alzheimers, forest_clf.predict(TestPatientsBeta))
+print("F1 score = ", newf1performance)
+
+newprecision = precision_score(Test_Alzheimers, forest_clf.predict(TestPatientsBeta))
+newrecall = recall_score(Test_Alzheimers, forest_clf.predict(TestPatientsBeta))
+print("precision = ", newprecision, ", recall = ", newrecall)
+
+# So we saw how each of these algorithms assigned our some_digit, and the relative scores
+# each algorithm gave all 10 possible classifications for some_digit. What if we want
+# to measure the performance of the algorithms on our test data?
+#
+# TODO: Compute the cross_val_score on our revised sgd_clf and on our forest_clf algorithms,
+#     supplying the same types of arguments as we did previously when we computed the
+#     cross_val_score for our 5/not-5 binary classification. Except that instead of y_train_5
+#     labels, we will this time supply y_train for our labels argument to the function. You
+#     may need to scroll or "find" back up in the code to see how you called cross_val_score
+#     previously:
+# sgd_score = ...
+# forest_score = ...
+
+# You are welcome to compare other performance metrics for these two algorithms. Which algorithm
+# would you say works better for multiclassification of the MNIST dataset and why?
