@@ -1,273 +1,92 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Jul 23 13:50:26 2019
-
-@author: ethankopf
-"""
-
-
-
-# Include these packages to support both python 2 and python 3
 from __future__ import division, print_function, unicode_literals
 
-# Other packages that we need to import for use in our script
 import numpy as np
 import os
 import pandas as pd
 
-# to make this script's output stable across runs, we need to initialize the random number generator to the same starting seed each time
 np.random.seed(42)
 
-# To save nice figures
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 
-####################
-# STEP 1: OBTAIN THE DATA
-####################
-
-# Now, we need to download a dataset to work with
-# The sklearn package has a function that can download the data for us:
-#from sklearn.datasets import fetch_mldata
+def isNumber(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
 
 PatientData = pd.read_excel("/Users/ethankopf/Desktop/NYCpatientsML.xlsx")
+AlzheimerData = pd.read_excel("/Users/ethankopf/Desktop/AorDML.xlsx")
 
-Sex = PatientData['Sex'].values
-Transgender = (PatientData['Transgender'].values == "YES, TRANSGENDER")
-SexualOrientation = PatientData['Sexual Orientation'].values
-HispanicEthnicity = (PatientData['Hispanic Ethnicity'].values == "YES")
-Race = PatientData['Race'].values
-newRaces = []
-for i in Race:
-    if i == "WHITE ONLY":
-        newRaces.append(0)
-    if i == "5":
-        newRaces.append(1)
-    if i == "BLACK ONLY":
-        newRaces.append(2)
-    if i == "3 RACE":
-        newRaces.append(3)
-    if i == "MULTI-RACIAL":
-        newRaces.append(4)
-Race = newRaces
-VeteranStatus = (PatientData['Veteran Status'].values == "YES")
-MentalIllness = (PatientData['Mental Illness'].values == "YES")
-IntellectualDisability = (PatientData['Intellectual Disability'].values == "YES") 
-AutismSpectrum = (PatientData['Autism Spectrum'].values == "YES")
-OtherDevelopmentalDisability = (PatientData['Other Developmental Disability'].values == "YES")
-AlcoholRelatedDisorder = (PatientData['Alcohol Related Disorder'].values == "YES")
-Diabetes	 = (PatientData['Diabetes'].values=='YES')
-Obesity = (PatientData['Obesity'].values=='YES')
-HeartAttack	= (PatientData['Heart Attack'].values=='YES')
-Stroke = (PatientData['Stroke'].values=='YES')
-FiveCardiac = (PatientData['5 Cardiac'].values=='YES')
-PulmonaryAsthma = (PatientData['Pulmonary Asthma'].values=='YES')
-KidneyDisease = (PatientData['Kidney Disease'].values=='YES')
-LiverDisease = (PatientData['Liver Disease'].values=='YES')
-EndocrineCondition = (PatientData['Endocrine Condition'].values=='YES')
 
-AorD = PatientData['Alzheimer or Dementia'].values
-AorD = (AorD == "YES")
+AlzheimerData = (AlzheimerData.values == "YES")
+print(AlzheimerData)
 
-    
-TrainPatients = []  
+
+TrainPatientsBeta = []
+
+
 for i in range(0, 37722):
-    TrainPatients.append([Sex[i], Transgender[i], SexualOrientation[i], HispanicEthnicity[i], Race[i], VeteranStatus[i], MentalIllness[i], IntellectualDisability[i], AutismSpectrum[i], OtherDevelopmentalDisability[i], AlcoholRelatedDisorder[i], Diabetes[i], Obesity[i], HeartAttack[i], Stroke[i], FiveCardiac[i], PulmonaryAsthma[i], KidneyDisease[i], LiverDisease[i], EndocrineCondition[i]])
+    patient = []
+    for column in PatientData:
+        if isNumber(PatientData[column].values[i]):
+            patient.append(float(PatientData[column].values[i]))
+        else:
+            if PatientData[column].values[i]=="YES":
+                patient.append(0.2)
+            else:
+                patient.append(0)
+    TrainPatientsBeta.append(patient)
+    if i%(377*5)==0: print(int((i/377.22) + 1), "% DONE")
+      
 
-TestPatients = []
+TestPatientsBeta = []
+
+
 for i in range(37722, 47152):
-    TestPatients.append([Sex[i], Transgender[i], SexualOrientation[i], HispanicEthnicity[i], Race[i], VeteranStatus[i], MentalIllness[i], IntellectualDisability[i], AutismSpectrum[i], OtherDevelopmentalDisability[i], AlcoholRelatedDisorder[i], Diabetes[i], Obesity[i], HeartAttack[i], Stroke[i], FiveCardiac[i], PulmonaryAsthma[i], KidneyDisease[i], LiverDisease[i], EndocrineCondition[i]])
+    patient = []
+    for column in PatientData:
+        if isNumber(PatientData[column].values[i]):
+            patient.append(float(PatientData[column].values[i]))
+        else:
+            num = PatientData[column].values[i]=="YES"
+            patient.append(num)
+    TestPatientsBeta.append(patient)
+    if i%(377*5)==0: print(int(((i-37722)/90) + 1), "% DONE")
 
-
-####################
-# STEP 2: SEPARATE TRAINING AND TEST DATA
-####################
-
-# TO DO: We need to separate both our number data matrix (X) and
-#      the vector of labels that contains the true identity of
-#      each number (y). We have 70,000 numbers total, so lets
-#      use 60,000 numbers for training and 10,000 for test.
-#      Use your knowledge of slicing arrays to select the first
-#      60,000 numbers for training and the last 10,000 for testing:
-    
-print(AorD.size)
-Train_Alzheimers = AorD[0:37722]
-Test_Alzheimers = AorD[37722:47152]
+  
+Train_Alzheimers = AlzheimerData[0:37722]
+Test_Alzheimers = AlzheimerData[37722:47152]
 
 Train_Alzheimers.reshape(-1, 1)
 Test_Alzheimers.reshape(-1, 1)
 
-#print(Train_Sleep_Apnea)
-#print(Train_Caff_Beverages)
-
-
-# print(Train_Sleep_Apnea)
-# print(Train_Caff_Beverages)
-# print(Test_Sleep_Apnea)
-# print(Test_Caff_Beverages)
 
 from sklearn.linear_model import SGDClassifier
 
-# TO DO: Now, we need to call the SGDClassifier. This function
-#      requires two named arguments, max_iter and random_state.
-#      The max_iter argument sets the maximum number of
-#      iterations to perform while learning the task (it is
-#      a coincidence that this number should be set to 5). The
-#      random_state argument lets us specify a random seed
-#      to use to initialize our network. Lets use 42. Set the
-#      output of the function to 'sgd_clf'. This represents
-#      our learning algorithm object.
-#
-sgd_clf = SGDClassifier(max_iter=5, random_state=42, loss = "modified_huber")
+sgd_clf = SGDClassifier(max_iter=600, random_state=1, loss = "modified_huber")
 
-print(TrainPatients)
+print(TrainPatientsBeta)
 print(Train_Alzheimers)
 
-sgd_clf.fit(TrainPatients, Train_Alzheimers)
+sgd_clf.fit(TrainPatientsBeta, Train_Alzheimers)
 
-print(sgd_clf.predict(TestPatients))
-
-
-
-####################
-# STEP 5: EVALUATE THE NETWORK PERFORMANCE
-####################
-
-# To DO: Now we want to measure the performance of the training algorithm
-#      taking into account all of the training data. We can find out the
-#      exact performance of the algorithm because we know the real identities
-#      of the number samples and we know what the algorithm came up with
-#      for each sample. We need to import the function 'cross_val_score'
-#      from sklearn.model_selection and then call that function with the
-#      arguments 'sgd_clf' (the learning algorithm object), our training
-#      dataset (X_train), our label vector that labels whether each training row
-#      is a 5 or not a 5 (called y_train_5, don't use the other vector y_train
-#      for this exercise), and two named arguments: cv=3, scoring="accuracy"
+print(sgd_clf.predict(TestPatientsBeta))
 
 from sklearn.model_selection import cross_val_score
-performance = cross_val_score(sgd_clf, TestPatients, Test_Alzheimers, cv=3, scoring="accuracy")
+performance = cross_val_score(sgd_clf, TestPatientsBeta, Test_Alzheimers, cv=3, scoring="accuracy")
 print("cross_val_score = ", performance)
 
 
-# Before we go any further, refer back to the steps in Exercise 1 of the
-# Machine Learning lab in your lab manual. Let's discuss the performance
-# of the model and then see how we can better measure the performance.
-#
-# Important concepts here are:
-# - precision: accuracy of the positive predictions of the model. When
-#           the model says a number is a "5", how often is it right?
-# - recall: sensitivity of the model. How many "5"s in the dataset does
-#           it correctly detect?
-#
-# When we calculated the cross_val_score above, it looks really good at
-# over 90% accuracy. But that is only because the 5s make up about 10% of
-# the dataset. If it just categorizes every single number as "not-5", then
-# it already achieves 90% accuracy without doing anything useful.
-
-# TODO: A better measure of performance is the confusion matrix (discussed in your
-#     lab manual and the pre-lab lecture). To produce a confusion matrix that
-#     will give us a better indication of the model performance, import the
-#     confusion_matrix function from sklearn.metrics and then call that function
-#     with two arguments, the target classifications (y_train_5) and the predicted
-#     classifications (y_train_pred):
 from sklearn.metrics import confusion_matrix, precision_score, recall_score
-newperformance = confusion_matrix(Test_Alzheimers, sgd_clf.predict(TestPatients))
+newperformance = confusion_matrix(Test_Alzheimers, sgd_clf.predict(TestPatientsBeta))
 print(newperformance)
-#
-# We can also calculate values for precision and recall directly, by importing and
-# using the precision_score and recall_score functions from sklearn.metrics (and
-# passing in the same two arguments as when we called the confusion_matrix function)
-precision = precision_score(Test_Alzheimers, sgd_clf.predict(TestPatients))
-recall = recall_score(Test_Alzheimers, sgd_clf.predict(TestPatients))
+
+
+precision = precision_score(Test_Alzheimers, sgd_clf.predict(TestPatientsBeta))
+recall = recall_score(Test_Alzheimers, sgd_clf.predict(TestPatientsBeta))
 print("precision = ", precision, ", recall = ", recall)
 
-# The model performance is a balance between precision and recall. If we alter the
-# sensitivity of the model, we can increase precision but at the expense of recall,
-# and vice versa. Sometimes people combine these two performance measures into a
-# single performance score called the F1 score, which will only be high (desirable)
-# if both precision and recall are sufficiently strong. To calculate the F1 score,
-# import and use the f1_score function from sklearn.metrics:
-from sklearn.metrics import f1_score
-f1performance = f1_score(Test_Alzheimers, sgd_clf.predict(TestPatients))
-print("F1 score = ", f1performance)
-
-####################
-# STEP 6: MULTICLASS CLASSIFICATION TASK
-####################
-
-# Now we can perform a more intuitive machine learning task on our data. Our dataset
-# contains ten different digits, so it makes sense to allow for the classification of
-# each digit into a category for its own identity. There are several ways to approach this
-# task. We can either use an algorithm that inherently supports multiclassification. Or
-# we can use a combination of binary classifiers to sort our data into multiple classes.
-#
-# If we use a combination of binary classifiers, we can go about it in two different ways.
-# We can either train one binary classifier on each target label in the dataset, and subject
-# each datum to every binary classifier; the one with the highest score "wins." This is
-# called "one-versus-all" or OvA. Or we can train binary classifiers for every possible
-# pair of digits (ex: 0 or 1? 0 or 2? 1 or 2? 0 or 3? ... and so on). For the MNIST dataset,
-# this means 45 different binary "competitions." Each digit has to be run through all 45
-# of these competitions, and whichever digit classifier wins the most of them is then considered
-# the predicted class of that digit. This technique is refered to as "one-versus-one" or OvO.
-# Which technique you use depends on the type of binary classifier you are using and the
-# properties and size of your dataset.
-#
-# Let's compare the performance of two different approaches to multiclassification:
-# - using a set of binary classifiers in an OvA configuration
-# - using a multiclassifier
-#
-# TODO: Use the SDGclassifier again. This time, we will be working with y_train labels
-#     (not y_train_5 labels). Scroll or "find" many lines back in this script where
-#     you used the "fit" and "predict" functions of the sgd_clf class. Use them again
-#     here with the same data (X_train) and the appropriate set of labels (y_train).
-#sgd_clf.fit(X_train, y_train)
-#sgd_clf.predict(X_train)
-
-# TODO: Now see how this algorithm does on that same digit we used before, except now the
-#     algorithm is performing a multiclassification task. Uncomment the next two lines:
-#some_digit_scores = sgd_clf.decision_function([some_digit])
-#print("scores for some_digit=", some_digit_scores)
-#
-# Notice that scores are returned for each potential label of the digit, from 0 to 9.
-# Which score is the highest?
-#
-# TODO: To programmatically arrive at the highest-scoring category, uncomment these lines
-#     of code. Try to understand what each line does as you uncomment it:
-#n = np.argmax(some_digit_scores)
-#prediction = sgd_clf.classes_[n]
-
-# Now, let's try another approach, a multiclassifier algorithm called Random Forest.
-
-# TODO: call training function (fit) and a prediction function (prediction) for the
-#     random forest classifier (forest_clf), passing in the same arguments as when
-#     we used the previous algorithm:
-
-#from sklearn.ensemble import RandomForestClassifier
-#forest_clf = RandomForestClassifier(random_state=42)
-#forest_clf.fit(X_train, y_train)
-#forest_prediction = forest_clf.predict(X_train)
-
-# This function called directly gave us the predicted label for our "some_digit". But
-# what if we want to see how it rated all the possible options? If we want to see the
-# scores assigned to each potential label, we can run this line of code to get them:
-#possible_scores = forest_clf.predict_proba([some_digit])
-#print(possible_scores)
-
-# So we saw how each of these algorithms assigned our some_digit, and the relative scores
-# each algorithm gave all 10 possible classifications for some_digit. What if we want
-# to measure the performance of the algorithms on our test data?
-#
-# TODO: Compute the cross_val_score on our revised sgd_clf and on our forest_clf algorithms,
-#     supplying the same types of arguments as we did previously when we computed the
-#     cross_val_score for our 5/not-5 binary classification. Except that instead of y_train_5
-#     labels, we will this time supply y_train for our labels argument to the function. You
-#     may need to scroll or "find" back up in the code to see how you called cross_val_score
-#     previously:
-# sgd_score = ...
-# forest_score = ...
-
-# You are welcome to compare other performance metrics for these two algorithms. Which algorithm
-# would you say works better for multiclassification of the MNIST dataset and why?
